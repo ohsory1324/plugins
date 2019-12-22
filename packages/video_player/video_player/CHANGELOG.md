@@ -1,6 +1,7 @@
 ## 0.10.5+1
 
 * Make sure the plugin is correctly initialized
+* iOS: Update texture on `seekTo`.
 
 ## 0.10.5
 
