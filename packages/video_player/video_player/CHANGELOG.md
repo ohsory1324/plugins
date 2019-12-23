@@ -1,5 +1,6 @@
-## 0.10.5+1
+## 0.10.6
 
+* Add macOS support
 * Make sure the plugin is correctly initialized
 * iOS: Update texture on `seekTo`.
 
