@@ -27,6 +27,7 @@
 namespace {
 
 using flutter::EncodableValue;
+using flutter::EncodableMap;
 
 class VideoPlayerPlugin : public flutter::Plugin {
  public:
@@ -47,7 +48,7 @@ class VideoPlayerPlugin : public flutter::Plugin {
 void VideoPlayerPlugin::RegisterWithRegistrar(
     flutter::PluginRegistrar *registrar) {
   auto channel = std::make_unique<flutter::MethodChannel<EncodableValue>>(
-      registrar->messenger(), "plugins.flutter.io/video_player",
+      registrar->messenger(), "flutter.io/videoPlayer",
       &flutter::StandardMethodCodec::GetInstance());
 
   // Uses new instead of make_unique due to private constructor.
@@ -68,47 +69,57 @@ VideoPlayerPlugin::~VideoPlayerPlugin() = default;
 void VideoPlayerPlugin::HandleMethodCall(
     const flutter::MethodCall<EncodableValue> &method_call,
     std::unique_ptr<flutter::MethodResult<EncodableValue>> result) {
-  // if (method_call.method_name().compare("getTemporaryDirectory") == 0) {
-  //   wchar_t path_buffer[MAX_PATH];
-  //   DWORD length = GetTempPath(MAX_PATH, path_buffer);
-  //   if (length == 0 || length > MAX_PATH) {
-  //     result->Error("Unable to get temporary path");
-  //     return;
-  //   }
-  //   std::string result_path = StdStringFromWideChars(path_buffer);
-  //   flutter::EncodableValue response(result_path);
-  //   result->Success(&response);
-  // } else if (method_call.method_name().compare(
-  //                "getApplicationSupportDirectory") == 0) {
-  //   std::string path = GetFolderPath(FOLDERID_RoamingAppData);
-  //   if (path.empty()) {
-  //     result->Error("Unable to get application data path");
-  //     return;
-  //   }
-  //   // Use the executable name as the subdirectory for now.
-  //   std::string exe_name = GetExecutableName();
-  //   if (exe_name.empty()) {
-  //     result->Error("Unable to get exe name");
-  //     return;
-  //   }
-  //   std::ostringstream response_stream;
-  //   response_stream << path << "\\" << exe_name;
-  //   flutter::EncodableValue response(response_stream.str());
-  //   result->Success(&response);
-  // } else if (method_call.method_name().compare(
-  //                "getApplicationDocumentsDirectory") == 0) {
-  //   std::string path = GetFolderPath(FOLDERID_Documents);
-  //   if (path.empty()) {
-  //     result->Error("Unable to get documents path");
-  //     return;
-  //   }
-  //   flutter::EncodableValue response(path);
-  //   result->Success(&response);
-  // } else {
-  //   result->NotImplemented();
-  // }
-}
-
+    if (method_call.method_name().compare("init") == 0) { // void
+        result->Success();
+    }
+    else if (method_call.method_name().compare("create") == 0) { // map
+        // video player 持失
+        
+        // EventChannel 持失 flutter.io/videoPlayer/videoEvents + id
+        
+        //auto &argsMap = method_call.arguments()->MapValue();
+        //if (argsMap["asset"].StringValue()) {
+            //argsMap["package"].StringValue()
+        //}
+        //else {
+            //argsMap["uri"].StringValue()
+            //argsMap["formatHint"].StringValue()
+        //}
+        //
+        EncodableValue result = EncodableValue(EncodableMap{
+            {EncodableValue("textureId"), EncodableValue(0)}
+        })
+        result->Success(&result);
+    }
+    else {
+        // &argsMap = method_call.arguments()->MapValue();
+        //argsMap["textureId"].StringValue();
+        if (method_call.method_name().compare("dispose") == 0) { // void
+            result->Success();
+        }
+        else if (method_call.method_name().compare("setLooping") == 0) { // void
+            //argsMap["looping"].BoolValue();
+            result->Success();
+        }
+        else if (method_call.method_name().compare("play") == 0) { // void
+            result->Success();
+        }
+        else if (method_call.method_name().compare("pause") == 0) { // void
+            result->Success();
+        }
+        else if (method_call.method_name().compare("setVolume") == 0) { // void
+            //argsMap["volume"].DoubleValue();
+            result->Success();
+        }
+        else if (method_call.method_name().compare("seekTo") == 0) { // void
+            //argsMap["location"].IntValue();
+            result->Success();
+        }
+        else if (method_call.method_name().compare("position") == 0) { // int
+            result->Success();
+        }
+        result->NotImplemented();
+    }
 }  // namespace
 
 void VideoPlayerPluginRegisterWithRegistrar(
