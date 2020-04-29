@@ -27,6 +27,9 @@
     <ClInclude Include="$(FlutterPluginName)_plugin.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="video_player_plugin.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(FLUTTER_EPHEMERAL_DIR)\cpp_client_wrapper\plugin_registrar.cc">
@@ -40,6 +43,9 @@
     </ClCompile>
     <ClCompile Include="$(FlutterPluginName)_plugin.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="video_player_plugin.cpp">
+      <Filter>Resource Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

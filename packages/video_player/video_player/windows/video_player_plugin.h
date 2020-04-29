@@ -11,8 +11,8 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-#ifndef PLUGINS_PATH_PROVIDER_PLUGIN_WINDOWS_H_
-#define PLUGINS_PATH_PROVIDER_PLUGIN_WINDOWS_H_
+#ifndef PLUGINS_VIDEO_PLAYER_PLUGIN_WINDOWS_H_
+#define PLUGINS_VIDEO_PLAYER_PLUGIN_WINDOWS_H_
 
 #include <flutter_plugin_registrar.h>
 
@@ -26,11 +26,11 @@
 extern "C" {
 #endif
 
-FLUTTER_PLUGIN_EXPORT void PathProviderPluginRegisterWithRegistrar(
+FLUTTER_PLUGIN_EXPORT void VideoPlayerPluginRegisterWithRegistrar(
     FlutterDesktopPluginRegistrarRef registrar);
 
 #if defined(__cplusplus)
 }  // extern "C"
 #endif
 
-#endif  // PLUGINS_PATH_PROVIDER_PLUGIN_WINDOWS_H_
+#endif  // PLUGINS_VIDEO_PLAYER_PLUGIN_WINDOWS_H_

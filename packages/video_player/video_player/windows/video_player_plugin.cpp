@@ -12,12 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 #include "video_player_plugin.h"
+#include "Player.h"
 
-#include <ShlObj.h>
+#include <shlObj.h>
+#include <shlwapi.h>
 #include <flutter/method_channel.h>
 #include <flutter/plugin_registrar_windows.h>
 #include <flutter/standard_method_codec.h>
 #include <windows.h>
+#include <mfapi.h>
+#include <mfidl.h>
+#include <evr.h>
 
 #include <codecvt>
 #include <memory>
@@ -29,30 +34,34 @@ namespace {
 using flutter::EncodableValue;
 using flutter::EncodableMap;
 
+CPlayer* g_pPlayer = NULL;
+
 class VideoPlayerPlugin : public flutter::Plugin {
  public:
-  static void RegisterWithRegistrar(flutter::PluginRegistrar *registrar);
+  static void RegisterWithRegistrar(flutter::PluginRegistrarWindows *registrar);
 
   virtual ~VideoPlayerPlugin();
 
  private:
-  VideoPlayerPlugin();
+  VideoPlayerPlugin(flutter::PluginRegistrarWindows *registrar);
 
   // Called when a method is called on plugin channel;
   void HandleMethodCall(
       const flutter::MethodCall<EncodableValue> &method_call,
       std::unique_ptr<flutter::MethodResult<EncodableValue>> result);
+
+  flutter::PluginRegistrarWindows *registrar_;
 };
 
 // static
 void VideoPlayerPlugin::RegisterWithRegistrar(
-    flutter::PluginRegistrar *registrar) {
+    flutter::PluginRegistrarWindows *registrar) {
   auto channel = std::make_unique<flutter::MethodChannel<EncodableValue>>(
       registrar->messenger(), "flutter.io/videoPlayer",
       &flutter::StandardMethodCodec::GetInstance());
 
   // Uses new instead of make_unique due to private constructor.
-  std::unique_ptr<VideoPlayerPlugin> plugin(new VideoPlayerPlugin());
+  std::unique_ptr<VideoPlayerPlugin> plugin(new VideoPlayerPlugin(registrar));
 
   channel->SetMethodCallHandler(
       [plugin_pointer = plugin.get()](const auto &call, auto result) {
@@ -62,21 +71,50 @@ void VideoPlayerPlugin::RegisterWithRegistrar(
   registrar->AddPlugin(std::move(plugin));
 }
 
-VideoPlayerPlugin::VideoPlayerPlugin() = default;
+VideoPlayerPlugin::VideoPlayerPlugin(flutter::PluginRegistrarWindows* registrar)
+    : registrar_(registrar) {}
 
 VideoPlayerPlugin::~VideoPlayerPlugin() = default;
 
 void VideoPlayerPlugin::HandleMethodCall(
-    const flutter::MethodCall<EncodableValue> &method_call,
+    const flutter::MethodCall<EncodableValue>& method_call,
     std::unique_ptr<flutter::MethodResult<EncodableValue>> result) {
     if (method_call.method_name().compare("init") == 0) { // void
+        // player들 전부 dispose
+        /* 
+        The CPlayer destructor is also private.
+        The CPlayer class implements IUnknown, so the object's lifetime is controlled through its reference count (m_nRefCount).
+        To destroy the object, the application calls IUnknown::Release, not delete.
+        */
         result->Success();
     }
     else if (method_call.method_name().compare("create") == 0) { // map
-        // video player 생성
+        // player 생성
+        //HWND hwnd = GetAncestor(registrar_->GetView()->GetNativeWindow(), GA_ROOT);
+        //HRESULT hresult = CPlayer::CreateInstance(hwnd, hwnd, &g_pPlayer);
+        //printf("%d", hresult);
         
         // EventChannel 생성 flutter.io/videoPlayer/videoEvents + id
-        
+        auto channel = std::make_unique<flutter::MethodChannel<EncodableValue>>(
+            registrar_->messenger(), "flutter.io/videoPlayer/videoEvents0",
+            &flutter::StandardMethodCodec::GetInstance());
+        channel->SetMethodCallHandler(
+            [](const flutter::MethodCall<EncodableValue>& call,
+                std::unique_ptr<flutter::MethodResult<EncodableValue>> result) {
+                if (call.method_name().compare("listen") == 0) {
+                    result->Success();
+                }
+                else if (call.method_name().compare("cancel") == 0) {
+                    result->Success();
+                }
+                else {
+                    result->NotImplemented();
+                }
+            });
+
+        //비디오 이벤트 발생시 event, values, width, height를 Map형태로 넘겨야함
+        //globalRegistrar->messenger()->SetMessageHandler(&channel, flutter::BinaryMessageHandler());
+
         //auto &argsMap = method_call.arguments()->MapValue();
         //if (argsMap["asset"].StringValue()) {
             //argsMap["package"].StringValue()
@@ -85,11 +123,10 @@ void VideoPlayerPlugin::HandleMethodCall(
             //argsMap["uri"].StringValue()
             //argsMap["formatHint"].StringValue()
         //}
-        //
-        EncodableValue result = EncodableValue(EncodableMap{
+        EncodableValue resultMap = EncodableValue(EncodableMap{
             {EncodableValue("textureId"), EncodableValue(0)}
-        })
-        result->Success(&result);
+        });
+        result->Success(&resultMap);
     }
     else {
         // &argsMap = method_call.arguments()->MapValue();
@@ -120,6 +157,7 @@ void VideoPlayerPlugin::HandleMethodCall(
         }
         result->NotImplemented();
     }
+}
 }  // namespace
 
 void VideoPlayerPluginRegisterWithRegistrar(
